@@ -1,34 +1,64 @@
 ## Getting Started
 
-First, run the development server:
+Install the packages
 
 ```bash
-npm run dev
+pnpm install
 # or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Local LLM setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Using MLX server
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**with uv**
 
-## Learn More
+```bash
+# with uv (recommended)
 
-To learn more about Next.js, take a look at the following resources:
+# lets install UV first
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Once installed, restart terminal
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+uv venv --python 3.11  # we need this python version for the mlx-omni-server package to work
 
-## Deploy on Vercel
+source .venv/bin/activate
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# lets install the mlx-omni-server
+uv pip install mlx-omni-server
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# start the mlx-omni-server
+mlx-omni-server
+```
+
+**with pip**
+
+```bash
+# with pip
+
+python -m venv venv
+source venv/bin/activate
+
+pip install mlx-omni-server
+
+# start the mlx omni server
+mlx-omni-server
+```
+
+### Start the webserver
+
+lets run the db migrations locally
+
+```bash
+npx prisma migrate dev
+```
+
+```bash
+npm run build
+```
+
+and go to localhost:3000
