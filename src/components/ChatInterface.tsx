@@ -15,11 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import type { Message } from "ai";
-
-interface ChatInterfaceProps {
-  isSidebarOpen: boolean;
-  setIsSidebarOpen: (isOpen: boolean) => void;
-}
+import { useSidebar } from "@/contexts/SidebarContext";
 
 interface Conversation {
   id: string;
@@ -27,10 +23,8 @@ interface Conversation {
   messages: Message[];
 }
 
-export default function ChatInterface({
-  isSidebarOpen,
-  setIsSidebarOpen,
-}: ChatInterfaceProps) {
+export default function ChatInterface(): JSX.Element {
+  const { isSidebarOpen, toggleSidebar } = useSidebar();
   const router = useRouter();
   const params = useParams();
   const [conversationId, setConversationId] = useState<string | null>(
@@ -126,7 +120,7 @@ export default function ChatInterface({
       <div className="fixed top-4 left-4 z-40 flex gap-2">
         <button
           type="button"
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          onClick={toggleSidebar}
           className="p-2 rounded-full bg-secondary hover:bg-secondary/80"
         >
           <Menu className="h-3 w-3" />
@@ -136,7 +130,7 @@ export default function ChatInterface({
         </Link>
       </div>
 
-      <main className="w-full max-w-2xl p-4 mt-16 mb-32">
+      <main className="w-full max-w-2xl p-4 mt-16 mb-16">
         <div className="space-y-4">
           {messages.map((message, index) => (
             <div
