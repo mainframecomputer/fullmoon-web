@@ -4,13 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, Plus } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { useSidebar } from "@/contexts/SidebarContext";
 
-interface ChatSidebarProps {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-}
-
-export default function ChatSidebar({ isOpen, setIsOpen }: ChatSidebarProps) {
+export default function ChatSidebar() {
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
   const [conversations, setConversations] = useState<
     Array<{ id: string; createdAt: Date; title: string }>
   >([]);
@@ -27,7 +24,7 @@ export default function ChatSidebar({ isOpen, setIsOpen }: ChatSidebarProps) {
   return (
     <div
       className={`fixed inset-y-0 left-0 z-50 w-64 bg-background border-r transform transition-transform duration-200 ease-in-out ${
-        isOpen ? "translate-x-0" : "-translate-x-full"
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
       <div className="flex flex-col h-full">
@@ -35,7 +32,7 @@ export default function ChatSidebar({ isOpen, setIsOpen }: ChatSidebarProps) {
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => setIsOpen(false)}
+              onClick={() => setIsSidebarOpen(false)}
               className="p-2 rounded-full bg-secondary hover:bg-secondary/80"
             >
               <Menu className="h-3 w-3" />

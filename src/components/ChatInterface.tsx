@@ -15,11 +15,9 @@ import { Button } from "@/components/ui/button";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import type { Message } from "ai";
-
-interface ChatInterfaceProps {
-  isSidebarOpen: boolean;
-  setIsSidebarOpen: (isOpen: boolean) => void;
-}
+import { useSidebar } from "@/contexts/SidebarContext";
+import MoonPhaseIcon, { MOON_PHASES } from "@/components/icons/MoonPhaseIcon";
+import { getMoonPhase } from "@/lib/utils";
 
 interface Conversation {
   id: string;
@@ -27,10 +25,8 @@ interface Conversation {
   messages: Message[];
 }
 
-export default function ChatInterface({
-  isSidebarOpen,
-  setIsSidebarOpen,
-}: ChatInterfaceProps) {
+export default function ChatInterface(): JSX.Element {
+  const { isSidebarOpen, toggleSidebar } = useSidebar();
   const router = useRouter();
   const params = useParams();
   const [conversationId, setConversationId] = useState<string | null>(
@@ -79,6 +75,30 @@ export default function ChatInterface({
     }
   };
 
+  const getCurrentMoonPhase = () => {
+    const phase = getMoonPhase();
+    switch (phase) {
+      case "new":
+        return MOON_PHASES.NEW;
+      case "waxing-crescent":
+        return MOON_PHASES.WAXING_CRESCENT;
+      case "first-quarter":
+        return MOON_PHASES.FIRST_QUARTER;
+      case "waxing-gibbous":
+        return MOON_PHASES.WAXING_GIBBOUS;
+      case "full":
+        return MOON_PHASES.FULL;
+      case "waning-gibbous":
+        return MOON_PHASES.WANING_GIBBOUS;
+      case "last-quarter":
+        return MOON_PHASES.LAST_QUARTER;
+      case "waning-crescent":
+        return MOON_PHASES.WANING_CRESCENT;
+      default:
+        return MOON_PHASES.NEW;
+    }
+  };
+
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -113,10 +133,20 @@ export default function ChatInterface({
         isSidebarOpen ? "pl-64" : "pl-0"
       }`}
     >
+      <div className="fixed top-0 left-0 right-0 p-4 bg-background border-b text-center">
+        <div
+          className={`flex items-center transition-all duration-200 ease-in-out ${
+            isSidebarOpen ? "ml-64" : "ml-20"
+          }`}
+        >
+          <h1 className="text-md font-bold">{conversation?.title || "chat"}</h1>
+        </div>
+      </div>
+
       <div className="fixed top-4 left-4 z-40 flex gap-2">
         <button
           type="button"
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          onClick={toggleSidebar}
           className="p-2 rounded-full bg-secondary hover:bg-secondary/80"
         >
           <Menu className="h-3 w-3" />
@@ -126,34 +156,47 @@ export default function ChatInterface({
         </Link>
       </div>
 
-      <main className="w-full max-w-2xl p-4">
-        <div className="space-y-4 max-h-[calc(100vh-100px)]">
-          {messages.map((message, index) => (
-            <div
-              key={message.id}
-              className={`flex ${
-                message.role === "user" ? "justify-end" : "justify-start"
-              }`}
-            >
+      <main className="w-full max-w-2xl p-4 mt-16 mb-16">
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)]">
+            <MoonPhaseIcon
+              phase={getCurrentMoonPhase()}
+              size={48}
+              color="currentColor"
+            />
+            {/* <p className="mt-4 text-muted-foreground text-sm">
+              Start a conversation...
+            </p> */}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {messages.map((message, index) => (
               <div
-                className={`max-w-[80%] rounded-3xl px-4 py-2 ${
-                  message.role === "user"
-                    ? "bg-blue-500 text-white"
-                    : "text-foreground"
+                key={message.id}
+                className={`flex ${
+                  message.role === "user" ? "justify-end" : "justify-start"
                 }`}
               >
-                <p className="whitespace-pre-wrap">
-                  {message.content}
-                  {isLoading &&
-                    index === messages.length - 1 &&
-                    message.role === "assistant" &&
-                    "🌕"}
-                </p>
+                <div
+                  className={`max-w-[80%] rounded-3xl px-4 py-2 ${
+                    message.role === "user"
+                      ? "bg-secondary text-foreground"
+                      : "text-foreground"
+                  }`}
+                >
+                  <p className="whitespace-pre-wrap">
+                    {message.content}
+                    {isLoading &&
+                      index === messages.length - 1 &&
+                      message.role === "assistant" &&
+                      "🌕"}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
+            ))}
+          </div>
+        )}
+        <div ref={messagesEndRef} />
       </main>
 
       <div className="fixed bottom-0 w-full bg-background">
@@ -163,7 +206,7 @@ export default function ChatInterface({
               <Textarea
                 value={input}
                 onChange={handleInputChange}
-                placeholder="Ask me anything..."
+                placeholder="ask me anything..."
                 rows={1}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
