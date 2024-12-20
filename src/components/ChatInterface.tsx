@@ -16,6 +16,8 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import type { Message } from "ai";
 import { useSidebar } from "@/contexts/SidebarContext";
+import MoonPhaseIcon, { MOON_PHASES } from "@/components/icons/MoonPhaseIcon";
+import { getMoonPhase } from "@/lib/utils";
 
 interface Conversation {
   id: string;
@@ -70,6 +72,30 @@ export default function ChatInterface(): JSX.Element {
     if (response.ok) {
       const data = await response.json();
       setConversation(data);
+    }
+  };
+
+  const getCurrentMoonPhase = () => {
+    const phase = getMoonPhase();
+    switch (phase) {
+      case "new":
+        return MOON_PHASES.NEW;
+      case "waxing-crescent":
+        return MOON_PHASES.WAXING_CRESCENT;
+      case "first-quarter":
+        return MOON_PHASES.FIRST_QUARTER;
+      case "waxing-gibbous":
+        return MOON_PHASES.WAXING_GIBBOUS;
+      case "full":
+        return MOON_PHASES.FULL;
+      case "waning-gibbous":
+        return MOON_PHASES.WANING_GIBBOUS;
+      case "last-quarter":
+        return MOON_PHASES.LAST_QUARTER;
+      case "waning-crescent":
+        return MOON_PHASES.WANING_CRESCENT;
+      default:
+        return MOON_PHASES.NEW;
     }
   };
 
@@ -131,33 +157,46 @@ export default function ChatInterface(): JSX.Element {
       </div>
 
       <main className="w-full max-w-2xl p-4 mt-16 mb-16">
-        <div className="space-y-4">
-          {messages.map((message, index) => (
-            <div
-              key={message.id}
-              className={`flex ${
-                message.role === "user" ? "justify-end" : "justify-start"
-              }`}
-            >
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)]">
+            <MoonPhaseIcon
+              phase={getCurrentMoonPhase()}
+              size={48}
+              color="currentColor"
+            />
+            {/* <p className="mt-4 text-muted-foreground text-sm">
+              Start a conversation...
+            </p> */}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {messages.map((message, index) => (
               <div
-                className={`max-w-[80%] rounded-3xl px-4 py-2 ${
-                  message.role === "user"
-                    ? "bg-secondary text-foreground"
-                    : "text-foreground"
+                key={message.id}
+                className={`flex ${
+                  message.role === "user" ? "justify-end" : "justify-start"
                 }`}
               >
-                <p className="whitespace-pre-wrap">
-                  {message.content}
-                  {isLoading &&
-                    index === messages.length - 1 &&
-                    message.role === "assistant" &&
-                    "🌕"}
-                </p>
+                <div
+                  className={`max-w-[80%] rounded-3xl px-4 py-2 ${
+                    message.role === "user"
+                      ? "bg-secondary text-foreground"
+                      : "text-foreground"
+                  }`}
+                >
+                  <p className="whitespace-pre-wrap">
+                    {message.content}
+                    {isLoading &&
+                      index === messages.length - 1 &&
+                      message.role === "assistant" &&
+                      "🌕"}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
+            ))}
+          </div>
+        )}
+        <div ref={messagesEndRef} />
       </main>
 
       <div className="fixed bottom-0 w-full bg-background">
