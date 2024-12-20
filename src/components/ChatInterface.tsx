@@ -52,14 +52,23 @@ export default function ChatInterface({
   }, []);
 
   useEffect(() => {
-    scrollToBottom();
+    if (messages.length > 0) {
+      scrollToBottom();
+    }
   }, [messages, scrollToBottom]);
 
   useEffect(() => {
     if (conversationId) {
       console.log("fetching Conversation ID:", conversationId);
       fetchConversation();
+      if (input.trim()) {
+        const event = new Event(
+          "submit"
+        ) as unknown as React.FormEvent<HTMLFormElement>;
+        handleSubmit(event);
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId]);
 
   const fetchConversation = async () => {
@@ -89,6 +98,7 @@ export default function ChatInterface({
           const newConversation = await response.json();
           setConversationId(newConversation.id);
           router.push(`/c/${newConversation.id}`);
+          return;
         }
       } catch (error) {
         console.error("Failed to create conversation:", error);

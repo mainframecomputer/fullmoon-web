@@ -40,14 +40,7 @@ export async function POST(request: Request) {
   const conversation = await prisma.conversation.create({
     data: {
       title,
-      messages: {
-        create: {
-          content: message.content,
-          role: "user",
-        },
-      },
     },
-    include: { messages: true },
   });
 
   return NextResponse.json(conversation);
