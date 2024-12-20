@@ -113,6 +113,16 @@ export default function ChatInterface({
         isSidebarOpen ? "pl-64" : "pl-0"
       }`}
     >
+      <div className="fixed top-0 left-0 right-0 p-4 bg-background border-b text-center">
+        <div
+          className={`flex items-center transition-all duration-200 ease-in-out ${
+            isSidebarOpen ? "ml-64" : "ml-20"
+          }`}
+        >
+          <h1 className="text-md font-bold">{conversation?.title || "chat"}</h1>
+        </div>
+      </div>
+
       <div className="fixed top-4 left-4 z-40 flex gap-2">
         <button
           type="button"
@@ -126,8 +136,8 @@ export default function ChatInterface({
         </Link>
       </div>
 
-      <main className="w-full max-w-2xl p-4">
-        <div className="space-y-4 max-h-[calc(100vh-100px)]">
+      <main className="w-full max-w-2xl p-4 mt-16 mb-32">
+        <div className="space-y-4">
           {messages.map((message, index) => (
             <div
               key={message.id}
@@ -138,7 +148,7 @@ export default function ChatInterface({
               <div
                 className={`max-w-[80%] rounded-3xl px-4 py-2 ${
                   message.role === "user"
-                    ? "bg-blue-500 text-white"
+                    ? "bg-secondary text-foreground"
                     : "text-foreground"
                 }`}
               >
@@ -163,7 +173,7 @@ export default function ChatInterface({
               <Textarea
                 value={input}
                 onChange={handleInputChange}
-                placeholder="Ask me anything..."
+                placeholder="ask me anything..."
                 rows={1}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
