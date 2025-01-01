@@ -9,6 +9,7 @@ import {
   ArrowUp,
   Plus,
   HammerIcon,
+  Cog,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -135,11 +136,18 @@ export default function ChatInterface(): JSX.Element {
     >
       <div className="fixed top-0 left-0 right-0 p-4 bg-background border-b text-center">
         <div
-          className={`flex items-center transition-all duration-200 ease-in-out ${
+          className={`flex items-center justify-between transition-all duration-200 ease-in-out ${
             isSidebarOpen ? "ml-64" : "ml-20"
           }`}
         >
           <h1 className="text-md font-bold">{conversation?.title || "chat"}</h1>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-gray-400 hover:text-gray-300"
+          >
+            <Cog className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
