@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, Plus } from "lucide-react";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useSidebar } from "@/contexts/SidebarContext";
 
 export default function ChatSidebar() {
@@ -63,10 +62,6 @@ export default function ChatSidebar() {
               </Link>
             ))}
           </div>
-        </div>
-
-        <div className="p-4">
-          <ThemeToggle />
         </div>
       </div>
     </div>

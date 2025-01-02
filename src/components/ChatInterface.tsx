@@ -9,6 +9,7 @@ import {
   ArrowUp,
   Plus,
   HammerIcon,
+  Cog,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import type { Message } from "ai";
 import { useSidebar } from "@/contexts/SidebarContext";
 import MoonPhaseIcon, { MOON_PHASES } from "@/components/icons/MoonPhaseIcon";
 import { getMoonPhase } from "@/lib/utils";
+import SettingsDialog from "@/components/SettingsDialog";
 
 interface Conversation {
   id: string;
@@ -26,6 +28,7 @@ interface Conversation {
 }
 
 export default function ChatInterface(): JSX.Element {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const router = useRouter();
   const params = useParams();
@@ -135,11 +138,19 @@ export default function ChatInterface(): JSX.Element {
     >
       <div className="fixed top-0 left-0 right-0 p-4 bg-background border-b text-center">
         <div
-          className={`flex items-center transition-all duration-200 ease-in-out ${
+          className={`flex items-center justify-between h-6 transition-all duration-200 ease-in-out ${
             isSidebarOpen ? "ml-64" : "ml-20"
           }`}
         >
           <h1 className="text-md font-bold">{conversation?.title || "chat"}</h1>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-gray-400 hover:text-gray-300"
+            onClick={() => setIsSettingsOpen(true)}
+          >
+            <Cog className="h-3 w-3" />
+          </Button>
         </div>
       </div>
 
@@ -259,6 +270,10 @@ export default function ChatInterface(): JSX.Element {
           </div>
         </form>
       </div>
+      <SettingsDialog
+        isOpen={isSettingsOpen}
+        onOpenChange={setIsSettingsOpen}
+      />
     </div>
   );
 }
