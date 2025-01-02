@@ -11,6 +11,14 @@ import {
   HammerIcon,
   Cog,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useParams, useRouter } from "next/navigation";
@@ -27,6 +35,7 @@ interface Conversation {
 }
 
 export default function ChatInterface(): JSX.Element {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const router = useRouter();
   const params = useParams();
@@ -136,7 +145,7 @@ export default function ChatInterface(): JSX.Element {
     >
       <div className="fixed top-0 left-0 right-0 p-4 bg-background border-b text-center">
         <div
-          className={`flex items-center justify-between transition-all duration-200 ease-in-out ${
+          className={`flex items-center justify-between h-6 transition-all duration-200 ease-in-out ${
             isSidebarOpen ? "ml-64" : "ml-20"
           }`}
         >
@@ -145,8 +154,9 @@ export default function ChatInterface(): JSX.Element {
             variant="ghost"
             size="icon"
             className="text-gray-400 hover:text-gray-300"
+            onClick={() => setIsSettingsOpen(true)}
           >
-            <Cog className="h-4 w-4" />
+            <Cog className="h-3 w-3" />
           </Button>
         </div>
       </div>
@@ -267,6 +277,41 @@ export default function ChatInterface(): JSX.Element {
           </div>
         </form>
       </div>
+      <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+        <DialogContent className="sm:max-w-[350px] bg-secondary">
+          <DialogHeader>
+            <DialogTitle>settings</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <h4 className="text-sm font-bold">appearance</h4>
+              <div className="flex items-center justify-between">
+                <div className="text-sm">theme</div>
+                <select
+                  id="theme"
+                  value="system"
+                  className="bg-background border rounded-md px-2 py-1"
+                >
+                  <option value="system">System</option>
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                </select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h4 className="text-sm font-bold">credits</h4>
+              <p className="text-sm text-muted-foreground">version 0.1.0</p>
+            </div>
+          </div>
+          <DialogFooter className="sm:justify-start">
+            <DialogClose asChild>
+              <Button type="button" variant="outline">
+                close
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
