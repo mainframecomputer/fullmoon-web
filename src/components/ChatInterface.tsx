@@ -11,14 +11,6 @@ import {
   HammerIcon,
   Cog,
 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useParams, useRouter } from "next/navigation";
@@ -27,6 +19,7 @@ import type { Message } from "ai";
 import { useSidebar } from "@/contexts/SidebarContext";
 import MoonPhaseIcon, { MOON_PHASES } from "@/components/icons/MoonPhaseIcon";
 import { getMoonPhase } from "@/lib/utils";
+import SettingsDialog from "@/components/SettingsDialog";
 
 interface Conversation {
   id: string;
@@ -277,41 +270,10 @@ export default function ChatInterface(): JSX.Element {
           </div>
         </form>
       </div>
-      <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-        <DialogContent className="sm:max-w-[350px] bg-secondary">
-          <DialogHeader>
-            <DialogTitle>settings</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <h4 className="text-sm font-bold">appearance</h4>
-              <div className="flex items-center justify-between">
-                <div className="text-sm">theme</div>
-                <select
-                  id="theme"
-                  value="system"
-                  className="bg-background border rounded-md px-2 py-1"
-                >
-                  <option value="system">System</option>
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
-                </select>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <h4 className="text-sm font-bold">credits</h4>
-              <p className="text-sm text-muted-foreground">version 0.1.0</p>
-            </div>
-          </div>
-          <DialogFooter className="sm:justify-start">
-            <DialogClose asChild>
-              <Button type="button" variant="outline">
-                close
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <SettingsDialog
+        isOpen={isSettingsOpen}
+        onOpenChange={setIsSettingsOpen}
+      />
     </div>
   );
 }
