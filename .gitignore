@@ -45,3 +45,4 @@ dev.db
 
 # virtual environment
 .venv
+*.db-journal

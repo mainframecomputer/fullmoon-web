@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Menu, Plus } from "lucide-react";
+import { Menu, Plus, Trash2 } from "lucide-react";
 import { useSidebar } from "@/contexts/SidebarContext";
 
 export default function ChatSidebar() {
@@ -11,14 +11,30 @@ export default function ChatSidebar() {
     Array<{ id: string; createdAt: Date; title: string }>
   >([]);
 
-  useEffect(() => {
-    const fetchConversations = async () => {
-      const response = await fetch("/api/conversations");
-      const data = await response.json();
-      setConversations(data);
-    };
-    fetchConversations();
+  const fetchConversations = useCallback(async () => {
+    const response = await fetch("/api/conversations");
+    const data = await response.json();
+    setConversations(data);
   }, []);
+
+  useEffect(() => {
+    fetchConversations();
+  }, [fetchConversations]);
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`/api/conversations?id=${id}`, {
+        method: "DELETE",
+      });
+      console.log(response);
+      if (response.ok) {
+        await fetchConversations();
+      }
+    } catch (error) {
+      console.error("Failed to delete conversation:", error);
+    }
+  };
 
   return (
     <div
@@ -51,7 +67,7 @@ export default function ChatSidebar() {
               <Link
                 key={conversation.id}
                 href={`/c/${conversation.id}`}
-                className="block p-2 rounded-lg hover:bg-secondary/80 transition-colors"
+                className="group block p-2 rounded-lg hover:bg-secondary/80 transition-colors relative"
               >
                 <div className="text-sm">
                   {conversation.title}
@@ -59,6 +75,13 @@ export default function ChatSidebar() {
                     {new Date(conversation.createdAt).toLocaleDateString()}
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={(e) => handleDelete(conversation.id, e)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1 hover:bg-destructive/10 rounded transition-opacity"
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </button>
               </Link>
             ))}
           </div>
