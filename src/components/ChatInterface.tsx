@@ -167,7 +167,7 @@ export default function ChatInterface(): JSX.Element {
         </Link>
       </div>
 
-      <main className="w-full max-w-2xl p-4 mt-16 mb-16">
+      <main className="w-full max-w-2xl p-4 mt-16 mb-32">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)]">
             <MoonPhaseIcon
