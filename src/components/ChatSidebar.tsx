@@ -4,9 +4,12 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Menu, Plus, Trash2 } from "lucide-react";
 import { useSidebar } from "@/contexts/SidebarContext";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function ChatSidebar() {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar();
+  const router = useRouter();
+  const pathname = usePathname();
   const [conversations, setConversations] = useState<
     Array<{ id: string; createdAt: Date; title: string }>
   >([]);
@@ -27,8 +30,12 @@ export default function ChatSidebar() {
       const response = await fetch(`/api/conversations?id=${id}`, {
         method: "DELETE",
       });
-      console.log(response);
+
       if (response.ok) {
+        // If we're currently viewing this conversation, navigate to home
+        if (pathname === `/c/${id}`) {
+          router.replace("/");
+        }
         await fetchConversations();
       }
     } catch (error) {

@@ -50,6 +50,13 @@ export async function DELETE(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
+    const deleteAll = searchParams.get("deleteAll");
+
+    if (deleteAll === "true") {
+      // Delete all conversations (cascade delete will handle messages)
+      await prisma.conversation.deleteMany();
+      return NextResponse.json({ success: true });
+    }
 
     if (!id) {
       return NextResponse.json(
@@ -58,7 +65,7 @@ export async function DELETE(req: Request) {
       );
     }
 
-    // Delete the conversation - messages will be automatically deleted due to onDelete: Cascade
+    // Delete single conversation - messages will be automatically deleted due to onDelete: Cascade
     await prisma.conversation.delete({
       where: { id },
     });
