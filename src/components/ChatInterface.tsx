@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { Message } from "ai";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -27,15 +27,22 @@ interface Conversation {
   messages: Message[];
 }
 
-export default function ChatInterface(): JSX.Element {
+interface ChatInterfaceProps {
+  convo?: Conversation;
+}
+
+export default function ChatInterface({
+  convo,
+}: ChatInterfaceProps): JSX.Element {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const router = useRouter();
-  const params = useParams();
   const [conversationId, setConversationId] = useState<string | null>(
-    params.id as string
+    convo?.id || null
   );
-  const [conversation, setConversation] = useState<Conversation | null>(null);
+  const [conversation, setConversation] = useState<Conversation | null>(
+    convo || null
+  );
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +66,7 @@ export default function ChatInterface(): JSX.Element {
   useEffect(() => {
     if (conversationId) {
       console.log("fetching Conversation ID:", conversationId);
-      fetchConversation();
+      // fetchConversation();
       if (input.trim()) {
         const event = new Event(
           "submit"
