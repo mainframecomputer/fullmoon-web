@@ -1,0 +1,7 @@
+{
+  "/api/conversations/route": "app/api/conversations/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/api/chat/route": "app/api/chat/route.js",
+  "/c/[id]/page": "app/c/[id]/page.js",
+  "/page": "app/page.js"
+}

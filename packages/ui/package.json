@@ -1,0 +1,26 @@
+{
+  "name": "@fullmoon/ui",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./index.tsx",
+  "types": "./index.tsx",
+  "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.1.4",
+    "@radix-ui/react-dialog": "^1.1.4",
+    "@radix-ui/react-select": "^2.1.4",
+    "@radix-ui/react-slot": "^1.1.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.464.0",
+    "next-themes": "^0.4.3",
+    "tailwind-merge": "^2.5.5",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@types/react": "^18",
+    "typescript": "^5"
+  },
+  "peerDependencies": {
+    "react": "19.0.0-rc-66855b96-20241106"
+  }
+} 
