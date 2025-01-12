@@ -2,7 +2,6 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { streamText } from "ai";
 import { prisma } from "@/lib/prisma";
 
-console.log("LLM_BASE_URL:", process.env.LLM_BASE_URL);
 const openai = createOpenAI({
   baseURL: process.env.LLM_BASE_URL,
 });

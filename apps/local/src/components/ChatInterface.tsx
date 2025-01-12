@@ -40,9 +40,7 @@ export default function ChatInterface({
   const [conversationId, setConversationId] = useState<string | null>(
     convo?.id || null
   );
-  const [conversation, setConversation] = useState<Conversation | null>(
-    convo || null
-  );
+  const [conversation] = useState<Conversation | null>(convo || null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -77,13 +75,13 @@ export default function ChatInterface({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId]);
 
-  const fetchConversation = async () => {
-    const response = await fetch(`/api/conversations?id=${conversationId}`);
-    if (response.ok) {
-      const data = await response.json();
-      setConversation(data);
-    }
-  };
+  // const fetchConversation = async () => {
+  //   const response = await fetch(`/api/conversations?id=${conversationId}`);
+  //   if (response.ok) {
+  //     const data = await response.json();
+  //     setConversation(data);
+  //   }
+  // };
 
   const getCurrentMoonPhase = () => {
     const phase = getMoonPhase();
