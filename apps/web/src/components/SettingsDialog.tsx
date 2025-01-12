@@ -73,7 +73,7 @@ export default function SettingsDialog({
 
   const handleSaveEndpoint = async () => {
     try {
-      await db.setCustomEndpoint(customEndpoint || null);
+      await db.setCustomEndpoint(customEndpoint || undefined);
     } catch (error) {
       console.error("Error saving custom endpoint:", error);
     }

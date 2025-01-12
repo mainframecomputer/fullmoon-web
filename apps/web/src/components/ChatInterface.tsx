@@ -36,7 +36,9 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
     convo || null
   );
 
-  const [customEndpoint, setCustomEndpoint] = useState<string | null>(null);
+  const [customEndpoint, setCustomEndpoint] = useState<string | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     db.getCustomEndpoint().then((endpoint) => {
