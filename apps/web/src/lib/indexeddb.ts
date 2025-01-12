@@ -1,4 +1,4 @@
-import { openDB, type DBSchema } from "idb";
+import { openDB, type DBSchema, type IDBPObjectStore } from "idb";
 import type {
   DatabaseAdapter,
   Message,
@@ -10,28 +10,58 @@ interface FullmoonDB extends DBSchema {
   conversations: {
     key: string;
     value: Conversation;
-    indexes: { "by-updated": Date };
+    indexes: {
+      "by-updated": Date;
+      "by-created": Date;
+    };
   };
   messages: {
     key: string;
     value: Message;
-    indexes: { "by-conversation": string };
+    indexes: {
+      "by-conversation": string;
+      "by-created": Date;
+    };
+  };
+  settings: {
+    key: string;
+    value: {
+      id: string;
+      customEndpoint?: string;
+    };
   };
 }
 
 const DB_NAME = "fullmoon-db";
-const DB_VERSION = 1;
+const DB_VERSION = 5;
 
 async function getDB() {
   return openDB<FullmoonDB>(DB_NAME, DB_VERSION, {
     upgrade(db) {
-      const conversationStore = db.createObjectStore("conversations", {
-        keyPath: "id",
-      });
-      conversationStore.createIndex("by-updated", "updatedAt");
+      // Create or update conversations store
+      if (!db.objectStoreNames.contains("conversations")) {
+        const store = db.createObjectStore("conversations", {
+          keyPath: "id",
+        });
+        store.createIndex("by-updated", "updatedAt");
+        store.createIndex("by-created", "createdAt");
+      }
 
-      const messageStore = db.createObjectStore("messages", { keyPath: "id" });
-      messageStore.createIndex("by-conversation", "conversationId");
+      // Create or update messages store
+      if (!db.objectStoreNames.contains("messages")) {
+        const store = db.createObjectStore("messages", {
+          keyPath: "id",
+        });
+        store.createIndex("by-conversation", "conversationId");
+        store.createIndex("by-created", "createdAt");
+      }
+
+      // Create settings store if it doesn't exist
+      if (!db.objectStoreNames.contains("settings")) {
+        db.createObjectStore("settings", {
+          keyPath: "id",
+        });
+      }
     },
   });
 }
@@ -42,10 +72,10 @@ export class IndexedDBAdapter implements DatabaseAdapter {
   ): Promise<Conversation> {
     const db = await getDB();
     const newConversation: Conversation = {
-      ...conversation,
       id: uuidv4(),
+      ...conversation,
     };
-    await db.add("conversations", newConversation);
+    await db.put("conversations", newConversation);
     return newConversation;
   }
 
@@ -59,9 +89,9 @@ export class IndexedDBAdapter implements DatabaseAdapter {
     const db = await getDB();
     const conversations = await db.getAllFromIndex(
       "conversations",
-      "by-updated"
+      "by-created"
     );
-    return conversations || [];
+    return conversations.reverse();
   }
 
   async updateConversation(
@@ -69,9 +99,9 @@ export class IndexedDBAdapter implements DatabaseAdapter {
     data: Partial<Conversation>
   ): Promise<Conversation> {
     const db = await getDB();
-    const conversation = await this.getConversation(id);
+    const conversation = await db.get("conversations", id);
     if (!conversation) {
-      throw new Error(`Conversation not found: ${id}`);
+      throw new Error(`Conversation ${id} not found`);
     }
     const updatedConversation = {
       ...conversation,
@@ -103,11 +133,32 @@ export class IndexedDBAdapter implements DatabaseAdapter {
 
   async getMessages(conversationId: string): Promise<Message[]> {
     const db = await getDB();
-    return db.getAllFromIndex("messages", "by-conversation", conversationId);
+    const messages = await db.getAllFromIndex(
+      "messages",
+      "by-conversation",
+      conversationId
+    );
+    return messages.sort(
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+    );
   }
 
   async deleteMessage(id: string): Promise<void> {
     const db = await getDB();
     await db.delete("messages", id);
+  }
+
+  async getCustomEndpoint(): Promise<string | undefined> {
+    const db = await getDB();
+    const settings = await db.get("settings", "customEndpoint");
+    return settings?.customEndpoint;
+  }
+
+  async setCustomEndpoint(endpoint: string | undefined): Promise<void> {
+    const db = await getDB();
+    await db.put("settings", {
+      id: "customEndpoint",
+      customEndpoint: endpoint,
+    });
   }
 }

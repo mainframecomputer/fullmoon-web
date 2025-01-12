@@ -28,9 +28,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { IndexedDBAdapter } from "@/lib/indexeddb";
+import { Input } from "@/components/ui/input";
 
 const db = new IndexedDBAdapter();
 
@@ -45,7 +46,17 @@ export default function SettingsDialog({
 }: SettingsDialogProps): JSX.Element {
   const { theme, setTheme } = useTheme();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [customEndpoint, setCustomEndpoint] = useState<string>("");
   const router = useRouter();
+
+  useEffect(() => {
+    // Load custom endpoint when dialog opens
+    if (open) {
+      db.getCustomEndpoint().then((endpoint) => {
+        setCustomEndpoint(endpoint || "");
+      });
+    }
+  }, [open]);
 
   const handleDeleteChats = async () => {
     try {
@@ -57,6 +68,14 @@ export default function SettingsDialog({
       router.push("/");
     } catch (error) {
       console.error("Error deleting conversations:", error);
+    }
+  };
+
+  const handleSaveEndpoint = async () => {
+    try {
+      await db.setCustomEndpoint(customEndpoint || null);
+    } catch (error) {
+      console.error("Error saving custom endpoint:", error);
     }
   };
 
@@ -82,6 +101,26 @@ export default function SettingsDialog({
                     <SelectItem value="dark">dark</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h4 className="text-sm font-bold">model endpoint</h4>
+              <div className="space-y-2">
+                <div className="text-sm">custom endpoint URL</div>
+                <Input
+                  type="text"
+                  placeholder="openai compatible endpoint url"
+                  value={customEndpoint}
+                  onChange={(e) => setCustomEndpoint(e.target.value)}
+                  className="h-8"
+                />
+                <Button
+                  variant="secondary"
+                  className="h-8 px-3 w-full"
+                  onClick={handleSaveEndpoint}
+                >
+                  save endpoint
+                </Button>
               </div>
             </div>
             <div className="space-y-2">

@@ -36,6 +36,14 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
     convo || null
   );
 
+  const [customEndpoint, setCustomEndpoint] = useState<string | null>(null);
+
+  useEffect(() => {
+    db.getCustomEndpoint().then((endpoint) => {
+      setCustomEndpoint(endpoint);
+    });
+  });
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Update conversationId when convo changes
@@ -49,7 +57,10 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat({
       initialMessages: convo?.messages || [],
-      body: { conversationId },
+      body: {
+        conversationId,
+        customEndpoint, // Pass the custom endpoint to the API
+      },
       id: conversationId || "new",
       onFinish: async (message) => {
         if (!conversationId) return;
