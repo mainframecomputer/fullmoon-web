@@ -1,3 +1,4 @@
+import * as React from "react";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ChatSidebar from "@/components/ChatSidebar";
@@ -22,11 +23,8 @@ const ClientWrapper = ({ conversation }: { conversation: Conversation }) => {
   );
 };
 
-export default async function ConversationPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+// @ts-ignore
+export default async function ConversationPage({ params }) {
   const { id } = await params; // https://nextjs.org/docs/messages/sync-dynamic-apis
   const dbConversation = await prisma.conversation.findUnique({
     where: { id },
