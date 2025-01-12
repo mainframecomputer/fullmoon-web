@@ -6,12 +6,16 @@
    - Environments: .env.local
 
  [37m[1m [22m[39m Creating an optimized production build ...
+(node:59380) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:59411) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
  [32m[1m✓[22m[39m Compiled successfully
-[?25l [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[31mFailed to compile.
+[?25l [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m..[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m...[39m[2K[1G [37m[1m [22m[39m Linting and checking validity of types  [36m.[39m[31mFailed to compile.
 [39m
 [36m./lib/indexeddb.ts[39m:[33m46[39m:[33m5[39m
-[31m[1mType error[22m[39m: Type '{ id: string; title: string; createdAt: Date; updatedAt: Date; } | undefined' is not assignable to type '{ id: string; title: string; createdAt: Date; updatedAt: Date; } | null'.
-  Type 'undefined' is not assignable to type '{ id: string; title: string; createdAt: Date; updatedAt: Date; } | null'.
+[31m[1mType error[22m[39m: Type '{ id: string; createdAt: Date; title: string; updatedAt: Date; } | undefined' is not assignable to type '{ id: string; createdAt: Date; title: string; updatedAt: Date; } | null'.
+  Type 'undefined' is not assignable to type '{ id: string; createdAt: Date; title: string; updatedAt: Date; } | null'.
 
 [0m [90m 44 |[39m   [36masync[39m getConversation(id[33m:[39m string)[33m:[39m [33mPromise[39m[33m<[39m[33mConversation[39m [33m|[39m [36mnull[39m[33m>[39m {[0m
 [0m [90m 45 |[39m     [36mconst[39m db [33m=[39m [36mawait[39m getDB()[33m;[39m[0m
