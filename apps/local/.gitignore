@@ -35,4 +35,7 @@ next-env.d.ts
 
 # SQLite database files
 *.db
-*.db-journal 
+*.db-journal
+
+# Turbo
+.turbo 
