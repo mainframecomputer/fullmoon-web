@@ -1,64 +1,70 @@
+# Fullmoon Chat
+
+A monorepo containing two versions of the Fullmoon chat application:
+1. A local version using SQLite for storage
+2. A web version using IndexedDB for client-side storage
+
+## Project Structure
+
+```
+apps/
+  ├── local/          # SQLite-based version
+  └── web/            # IndexedDB-based version
+packages/
+  ├── database/       # Shared database interface
+  └── ui/             # Shared UI components
+```
+
 ## Getting Started
 
-Install the packages
+### Prerequisites
+
+- Node.js 18+
+- pnpm 8+
+
+### Installation
 
 ```bash
 pnpm install
+```
+
+### Development
+
+To run the local version (with SQLite):
+```bash
+pnpm dev --filter local
+```
+
+To run the web version (with IndexedDB):
+```bash
+pnpm dev --filter web
+```
+
+### Building
+
+To build all apps and packages:
+```bash
+pnpm build
+```
+
+To build a specific app:
+```bash
+pnpm build --filter local
 # or
-npm install
+pnpm build --filter web
 ```
 
-### Local LLM setup
+## Features
 
-Using MLX server
+- Chat interface with AI
+- Conversation management
+- Local storage options:
+  - SQLite for desktop/local version
+  - IndexedDB for web version
+- Shared UI components between versions
+- TypeScript support
+- Next.js-based applications
 
-**with uv**
+## License
 
-```bash
-# with uv (recommended)
-
-# lets install UV first
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-Once installed, restart terminal
-
-```bash
-uv venv --python 3.11  # we need this python version for the mlx-omni-server package to work
-
-source .venv/bin/activate
-
-# lets install the mlx-omni-server
-uv pip install mlx-omni-server
-
-# start the mlx-omni-server
-mlx-omni-server
-```
-
-**with pip**
-
-```bash
-# with pip
-
-python -m venv venv
-source venv/bin/activate
-
-pip install mlx-omni-server
-
-# start the mlx omni server
-mlx-omni-server
-```
-
-### Start the webserver
-
-lets run the db migrations locally
-
-```bash
-npx prisma migrate dev
-```
-
-```bash
-npm run build
-```
-
-and go to localhost:3000
+MIT
