@@ -36,13 +36,17 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
     convo || null
   );
 
-  const [customEndpoint, setCustomEndpoint] = useState<string | undefined>(
-    undefined
-  );
+  const [customEndpointSettings, setCustomEndpointSettings] = useState<
+    | {
+        endpoint?: string;
+        modelName?: string;
+      }
+    | undefined
+  >(undefined);
 
   useEffect(() => {
-    db.getCustomEndpoint().then((endpoint) => {
-      setCustomEndpoint(endpoint);
+    db.getCustomEndpoint().then((endpointSettings) => {
+      setCustomEndpointSettings(endpointSettings);
     });
   });
 
@@ -61,7 +65,7 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
       initialMessages: convo?.messages || [],
       body: {
         conversationId,
-        customEndpoint, // Pass the custom endpoint to the API
+        customEndpointSettings, // Pass the custom endpoint settings to the API
       },
       id: conversationId || "new",
       onFinish: async (message) => {
@@ -215,7 +219,7 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
             />
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 mb-16">
             {messages.map((message, index) => (
               <div
                 key={message.id}

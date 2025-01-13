@@ -47,13 +47,15 @@ export default function SettingsDialog({
   const { theme, setTheme } = useTheme();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [customEndpoint, setCustomEndpoint] = useState<string>("");
+  const [customModelName, setCustomModelName] = useState<string>("");
   const router = useRouter();
 
   useEffect(() => {
     // Load custom endpoint when dialog opens
     if (open) {
-      db.getCustomEndpoint().then((endpoint) => {
-        setCustomEndpoint(endpoint || "");
+      db.getCustomEndpoint().then((settings) => {
+        setCustomEndpoint(settings.endpoint || "");
+        setCustomModelName(settings.modelName || "");
       });
     }
   }, [open]);
@@ -73,9 +75,12 @@ export default function SettingsDialog({
 
   const handleSaveEndpoint = async () => {
     try {
-      await db.setCustomEndpoint(customEndpoint || undefined);
+      await db.setCustomEndpoint(
+        customEndpoint || undefined,
+        customModelName || undefined
+      );
     } catch (error) {
-      console.error("Error saving custom endpoint:", error);
+      console.error("Error saving endpoint settings:", error);
     }
   };
 
@@ -114,12 +119,20 @@ export default function SettingsDialog({
                   onChange={(e) => setCustomEndpoint(e.target.value)}
                   className="h-8"
                 />
+                <div className="text-sm">model name</div>
+                <Input
+                  type="text"
+                  placeholder="model name (e.g. gpt-4)"
+                  value={customModelName}
+                  onChange={(e) => setCustomModelName(e.target.value)}
+                  className="h-8"
+                />
                 <Button
                   variant="secondary"
-                  className="h-8 px-3 w-full"
+                  className="h-8 px-3 w-full hover:shadow-sm"
                   onClick={handleSaveEndpoint}
                 >
-                  save endpoint
+                  save endpoint settings
                 </Button>
               </div>
             </div>
