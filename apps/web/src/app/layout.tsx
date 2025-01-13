@@ -18,8 +18,22 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "fullmoon web",
-  description: "A chat interface powered by local LLMs",
+  title: "fullmoon: local intelligence",
+  description: "chat with private and local large language models",
+  metadataBase: new URL("https://fullmoon.app"),
+  openGraph: {
+    title: "fullmoon: local intelligence",
+    description: "chat with private and local large language models",
+    url: "https://fullmoon.app",
+    type: "website",
+    images: ["https://fullmoon.app/images/og.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "fullmoon: local intelligence",
+    description: "chat with private and local large language models",
+    images: ["https://fullmoon.app/images/og.png"],
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
