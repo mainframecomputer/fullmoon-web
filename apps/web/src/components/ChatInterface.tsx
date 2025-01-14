@@ -22,6 +22,7 @@ import SettingsDialog from "@/components/SettingsDialog";
 import { IndexedDBAdapter } from "@/lib/indexeddb";
 import type { Message as AiMessage } from "ai";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import readPDFText from "react-pdftotext";
 
 const db = new IndexedDBAdapter();
 
@@ -32,6 +33,19 @@ interface ConversationWithMessages extends Conversation {
 interface ChatInterfaceProps {
   convo?: ConversationWithMessages;
 }
+
+const MAX_FILE_SIZE = 100 * 1024; // 100KB
+const ALLOWED_FILE_TYPES = [
+  "text/plain",
+  "text/markdown",
+  "application/json",
+  "text/csv",
+  "text/html",
+  "text/javascript",
+  "text/typescript",
+  "text/css",
+  "application/pdf",
+];
 
 export function ChatInterface({ convo }: ChatInterfaceProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -44,6 +58,7 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
   const [, setConversation] = useState<ConversationWithMessages | null>(
     convo || null
   );
+  const [attachedFileName, setAttachedFileName] = useState<string | null>(null);
 
   const [customEndpointSettings, setCustomEndpointSettings] = useState<
     | {
@@ -69,6 +84,7 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
   }, [customEndpointSettings]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Update conversationId when convo changes
   useEffect(() => {
@@ -83,7 +99,7 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
       initialMessages: convo?.messages || [],
       body: {
         conversationId,
-        customEndpointSettings, // Pass the custom endpoint settings to the API
+        customEndpointSettings,
       },
       id: conversationId || "new",
       onFinish: async (message) => {
@@ -100,6 +116,58 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
         }
       },
     });
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      alert("File size must be less than 100KB");
+      return;
+    }
+
+    // Validate file type
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      alert("Invalid file type. Only text and PDF files are allowed.");
+      return;
+    }
+
+    try {
+      let content: string;
+      if (file.type === "application/pdf") {
+        content = await readPDFText(file);
+      } else {
+        content = await file.text();
+      }
+
+      // Append the file content to the input
+      const fileContent = `${input ? input + "\n\n" : ""}File: ${file.name}\n\`\`\`\n${content}\n\`\`\``;
+      handleInputChange({
+        target: { value: fileContent },
+      } as React.ChangeEvent<HTMLTextAreaElement>);
+
+      setAttachedFileName(file.name);
+    } catch (error) {
+      console.error("Error reading file:", error);
+      alert("Error reading file. Please try again.");
+    }
+
+    // Clear the file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const clearAttachment = () => {
+    setAttachedFileName(null);
+    handleInputChange({
+      target: { value: "" },
+    } as React.ChangeEvent<HTMLTextAreaElement>);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -118,6 +186,7 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
           "submit"
         ) as unknown as React.FormEvent<HTMLFormElement>;
         handleSubmit(event);
+        clearAttachment();
       }
     }
     // We intentionally omit input and handleSubmit from deps
@@ -133,7 +202,7 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
     if (!conversationId) {
       try {
         const newConversation = await db.createConversation({
-          title: userMessage.slice(0, 80),
+          title: userMessage.slice(0, 40),
           createdAt: new Date(),
           updatedAt: new Date(),
         });
@@ -159,11 +228,12 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
           conversationId: conversationId,
           createdAt: new Date(),
         });
+        handleSubmit(e);
+        clearAttachment();
       } catch (error) {
         console.error("Failed to save user message:", error);
       }
     }
-    handleSubmit(e);
   };
 
   const handleOpenChange = useCallback((open: boolean) => {
@@ -295,15 +365,41 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
                 className="w-full border-none text-foreground placeholder:text-gray-400 resize-none focus-visible:ring-0 focus-visible:ring-offset-0 min-h-[36px] align-middle shadow-none"
               />
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-0">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="text-gray-400 hover:text-gray-300"
-                  >
-                    <Paperclip className="h-5 w-5" />
-                  </Button>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    accept={ALLOWED_FILE_TYPES.join(",")}
+                  />
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="text-gray-400 hover:text-gray-300"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Paperclip className="h-3 w-3" />
+                    </Button>
+                    {attachedFileName && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-gray-400 truncate max-w-[150px]">
+                          {attachedFileName}
+                        </span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-4 w-4 text-gray-400 hover:text-gray-300"
+                          onClick={clearAttachment}
+                        >
+                          ×
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <Button
                   type="submit"
