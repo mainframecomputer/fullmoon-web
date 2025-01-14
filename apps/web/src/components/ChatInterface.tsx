@@ -142,7 +142,9 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
       }
 
       // Append the file content to the input
-      const fileContent = `${input ? input + "\n\n" : ""}File: ${file.name}\n\`\`\`\n${content}\n\`\`\``;
+      const fileContent = input
+        ? `${input}\n\nFile: ${file.name}\n\`\`\`\n${content}\n\`\`\``
+        : `File: ${file.name}\n\`\`\`\n${content}\n\`\`\``;
       handleInputChange({
         target: { value: fileContent },
       } as React.ChangeEvent<HTMLTextAreaElement>);
@@ -380,6 +382,7 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
                       size="icon"
                       className="text-gray-400 hover:text-gray-300"
                       onClick={() => fileInputRef.current?.click()}
+                      disabled={showSettingsAlert || isLoading}
                     >
                       <Paperclip className="h-3 w-3" />
                     </Button>
