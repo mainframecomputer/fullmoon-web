@@ -6,8 +6,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -32,7 +30,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { IndexedDBAdapter } from "@/lib/indexeddb";
 import { Input } from "@/components/ui/input";
-import MoonPhaseIcon, { MOON_PHASES } from "./icons/MoonPhaseIcon";
+import MoonPhaseIcon from "./icons/MoonPhaseIcon";
 import { getCurrentMoonPhase } from "@/lib/utils";
 import { Check, ChevronRight, ChevronLeft, MoveUpRight } from "lucide-react";
 import { useMemo } from "react";
@@ -41,11 +39,13 @@ import { useMemo } from "react";
 interface SettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSettingsChange?: () => void;
 }
 
 export default function SettingsDialog({
   open,
   onOpenChange,
+  onSettingsChange,
 }: SettingsDialogProps): JSX.Element {
   const { theme, setTheme } = useTheme();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -99,6 +99,7 @@ export default function SettingsDialog({
         customEndpoint || undefined,
         customModelName || undefined
       );
+      onSettingsChange?.();
       setTimeout(() => {
         setSaveSuccess(false);
       }, 2000);
@@ -162,9 +163,7 @@ export default function SettingsDialog({
           </div>
           <p className="text-xs text-muted-foreground mb-2">version 0.1.0</p>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground font-bold">
-              Made by
-            </span>
+            <span className="text-xs text-muted-foreground">Made by</span>
             <img
               src="/images/logo_dark.png"
               alt="Mainframe logo"
@@ -175,9 +174,7 @@ export default function SettingsDialog({
               alt="Mainframe logo"
               className="h-4 hidden dark:block"
             />
-            <span className="text-xs text-muted-foreground font-bold">
-              Mainframe
-            </span>
+            <span className="text-xs text-muted-foreground">Mainframe</span>
           </div>
         </div>
       </div>

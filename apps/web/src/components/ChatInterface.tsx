@@ -2,18 +2,26 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useChat } from "ai/react";
-import { Menu, Paperclip, ArrowUp, Plus, Cog } from "lucide-react";
+import {
+  Menu,
+  Paperclip,
+  ArrowUp,
+  Plus,
+  Cog,
+  MessageCircleWarning,
+} from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { Conversation } from "@fullmoon/database";
 import { useSidebar } from "@/contexts/SidebarContext";
-import MoonPhaseIcon, { MOON_PHASES } from "@/components/icons/MoonPhaseIcon";
+import MoonPhaseIcon from "@/components/icons/MoonPhaseIcon";
 import { getCurrentMoonPhase } from "@/lib/utils";
 import SettingsDialog from "@/components/SettingsDialog";
 import { IndexedDBAdapter } from "@/lib/indexeddb";
 import type { Message as AiMessage } from "ai";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const db = new IndexedDBAdapter();
 
@@ -27,6 +35,7 @@ interface ChatInterfaceProps {
 
 export function ChatInterface({ convo }: ChatInterfaceProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [showSettingsAlert, setShowSettingsAlert] = useState(false);
   const { isSidebarOpen, toggleSidebar } = useSidebar();
   const router = useRouter();
   const [conversationId, setConversationId] = useState<string | null>(
@@ -47,8 +56,17 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
   useEffect(() => {
     db.getCustomEndpoint().then((endpointSettings) => {
       setCustomEndpointSettings(endpointSettings);
+      setShowSettingsAlert(
+        !endpointSettings?.endpoint || !endpointSettings?.modelName
+      );
     });
   }, []);
+
+  useEffect(() => {
+    setShowSettingsAlert(
+      !customEndpointSettings?.endpoint || !customEndpointSettings?.modelName
+    );
+  }, [customEndpointSettings]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -152,6 +170,11 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
     setIsSettingsOpen(open);
   }, []);
 
+  const refreshEndpointSettings = useCallback(async () => {
+    const endpointSettings = await db.getCustomEndpoint();
+    setCustomEndpointSettings(endpointSettings);
+  }, []);
+
   return (
     <div
       className={`flex-1 flex justify-center transition-all duration-200 ease-in-out ${
@@ -191,12 +214,32 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
 
       <main className="w-full max-w-2xl p-4 mt-16 mb-16">
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)]">
-            <MoonPhaseIcon
-              phase={getCurrentMoonPhase()}
-              size={48}
-              color="currentColor"
-            />
+          <div className="flex flex-col h-[calc(100vh-200px)]">
+            <div className="flex-1 flex items-center justify-center">
+              <MoonPhaseIcon
+                phase={getCurrentMoonPhase()}
+                size={48}
+                color="currentColor"
+              />
+            </div>
+            {showSettingsAlert && (
+              <Alert className="w-full max-w-sm mx-auto">
+                <MessageCircleWarning className="h-4 w-4" />
+                <AlertTitle>setup required</AlertTitle>
+                <AlertDescription className="text-sm">
+                  please configure your API endpoint and model in settings to
+                  start chatting.
+                  <br />
+                  <Button
+                    variant="outline"
+                    className="px-2 py-1 h-auto mt-2"
+                    onClick={() => setIsSettingsOpen(true)}
+                  >
+                    open settings
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
         ) : (
           <div className="space-y-4 mb-16">
@@ -238,6 +281,11 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
                 onChange={handleInputChange}
                 placeholder="ask me anything..."
                 rows={1}
+                disabled={
+                  !customEndpointSettings?.endpoint ||
+                  !customEndpointSettings?.modelName ||
+                  isLoading
+                }
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
@@ -272,7 +320,11 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
         </form>
       </div>
 
-      <SettingsDialog open={isSettingsOpen} onOpenChange={handleOpenChange} />
+      <SettingsDialog
+        open={isSettingsOpen}
+        onOpenChange={handleOpenChange}
+        onSettingsChange={refreshEndpointSettings}
+      />
     </div>
   );
 }
