@@ -20,9 +20,9 @@ ollama pull mistral       # Mistral 7B
 
 #### option b: download from hugging face
 
-1. Visit [Hugging Face](https://huggingface.co/models)
-2. Search for compatible models (e.g., Llama 3)
-3. Download using Git LFS:
+1. visit [Hugging Face](https://huggingface.co/models)
+2. search for compatible models (e.g., Llama 3)
+3. download using Git LFS:
 
 ```bash
 # Example for Mistral 7B
