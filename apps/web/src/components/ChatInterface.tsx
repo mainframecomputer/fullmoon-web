@@ -10,7 +10,7 @@ import Link from "next/link";
 import type { Conversation } from "@fullmoon/database";
 import { useSidebar } from "@/contexts/SidebarContext";
 import MoonPhaseIcon, { MOON_PHASES } from "@/components/icons/MoonPhaseIcon";
-import { getMoonPhase } from "@/lib/utils";
+import { getCurrentMoonPhase } from "@/lib/utils";
 import SettingsDialog from "@/components/SettingsDialog";
 import { IndexedDBAdapter } from "@/lib/indexeddb";
 import type { Message as AiMessage } from "ai";
@@ -48,7 +48,7 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
     db.getCustomEndpoint().then((endpointSettings) => {
       setCustomEndpointSettings(endpointSettings);
     });
-  });
+  }, []);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -107,30 +107,6 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId]);
 
-  const getCurrentMoonPhase = () => {
-    const phase = getMoonPhase();
-    switch (phase) {
-      case "new":
-        return MOON_PHASES.NEW;
-      case "waxing-crescent":
-        return MOON_PHASES.WAXING_CRESCENT;
-      case "first-quarter":
-        return MOON_PHASES.FIRST_QUARTER;
-      case "waxing-gibbous":
-        return MOON_PHASES.WAXING_GIBBOUS;
-      case "full":
-        return MOON_PHASES.FULL;
-      case "waning-gibbous":
-        return MOON_PHASES.WANING_GIBBOUS;
-      case "last-quarter":
-        return MOON_PHASES.LAST_QUARTER;
-      case "waning-crescent":
-        return MOON_PHASES.WANING_CRESCENT;
-      default:
-        return MOON_PHASES.NEW;
-    }
-  };
-
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -171,6 +147,10 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
     }
     handleSubmit(e);
   };
+
+  const handleOpenChange = useCallback((open: boolean) => {
+    setIsSettingsOpen(open);
+  }, []);
 
   return (
     <div
@@ -292,7 +272,7 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
         </form>
       </div>
 
-      <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
+      <SettingsDialog open={isSettingsOpen} onOpenChange={handleOpenChange} />
     </div>
   );
 }
