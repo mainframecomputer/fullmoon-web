@@ -1,3 +1,4 @@
+import { MOON_PHASES } from "@/components/icons/MoonPhaseIcon";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -47,3 +48,27 @@ export function getMoonPhase(): string {
   }
   return "new";
 }
+
+export const getCurrentMoonPhase = () => {
+  const phase = getMoonPhase();
+  switch (phase) {
+    case "new":
+      return MOON_PHASES.NEW;
+    case "waxing-crescent":
+      return MOON_PHASES.WAXING_CRESCENT;
+    case "first-quarter":
+      return MOON_PHASES.FIRST_QUARTER;
+    case "waxing-gibbous":
+      return MOON_PHASES.WAXING_GIBBOUS;
+    case "full":
+      return MOON_PHASES.FULL;
+    case "waning-gibbous":
+      return MOON_PHASES.WANING_GIBBOUS;
+    case "last-quarter":
+      return MOON_PHASES.LAST_QUARTER;
+    case "waning-crescent":
+      return MOON_PHASES.WANING_CRESCENT;
+    default:
+      return MOON_PHASES.NEW;
+  }
+};
