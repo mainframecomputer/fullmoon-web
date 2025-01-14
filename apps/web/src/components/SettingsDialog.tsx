@@ -32,6 +32,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { IndexedDBAdapter } from "@/lib/indexeddb";
 import { Input } from "@/components/ui/input";
+import MoonPhaseIcon, { MOON_PHASES } from "./icons/MoonPhaseIcon";
+import { getMoonPhase } from "@/lib/utils";
+import { Check } from "lucide-react";
 
 const db = new IndexedDBAdapter();
 
@@ -48,6 +51,7 @@ export default function SettingsDialog({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [customEndpoint, setCustomEndpoint] = useState<string>("");
   const [customModelName, setCustomModelName] = useState<string>("");
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -59,6 +63,30 @@ export default function SettingsDialog({
       });
     }
   }, [open]);
+
+  const getCurrentMoonPhase = () => {
+    const phase = getMoonPhase();
+    switch (phase) {
+      case "new":
+        return MOON_PHASES.NEW;
+      case "waxing-crescent":
+        return MOON_PHASES.WAXING_CRESCENT;
+      case "first-quarter":
+        return MOON_PHASES.FIRST_QUARTER;
+      case "waxing-gibbous":
+        return MOON_PHASES.WAXING_GIBBOUS;
+      case "full":
+        return MOON_PHASES.FULL;
+      case "waning-gibbous":
+        return MOON_PHASES.WANING_GIBBOUS;
+      case "last-quarter":
+        return MOON_PHASES.LAST_QUARTER;
+      case "waning-crescent":
+        return MOON_PHASES.WANING_CRESCENT;
+      default:
+        return MOON_PHASES.NEW;
+    }
+  };
 
   const handleDeleteChats = async () => {
     try {
@@ -75,10 +103,14 @@ export default function SettingsDialog({
 
   const handleSaveEndpoint = async () => {
     try {
+      setSaveSuccess(true);
       await db.setCustomEndpoint(
         customEndpoint || undefined,
         customModelName || undefined
       );
+      setTimeout(() => {
+        setSaveSuccess(false);
+      }, 2000);
     } catch (error) {
       console.error("Error saving endpoint settings:", error);
     }
@@ -132,7 +164,11 @@ export default function SettingsDialog({
                   className="h-8 px-3 w-full hover:shadow-sm"
                   onClick={handleSaveEndpoint}
                 >
-                  save endpoint settings
+                  {saveSuccess ? (
+                    <Check className="h-4 w-4 animate-in zoom-in duration-300" />
+                  ) : (
+                    "save endpoint settings"
+                  )}
                 </Button>
               </div>
             </div>
@@ -150,7 +186,36 @@ export default function SettingsDialog({
             </div>
             <div className="space-y-2">
               <h4 className="text-sm font-bold">credits</h4>
-              <p className="text-sm text-muted-foreground">version 0.1.0</p>
+              <div className="flex flex-col items-center gap-2 pt-8 pb-8">
+                <div className="text-muted-foreground">
+                  <MoonPhaseIcon
+                    phase={getCurrentMoonPhase()}
+                    size={14}
+                    color="currentColor"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mb-2">
+                  version 0.1.0
+                </p>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground font-bold">
+                    Made by
+                  </span>
+                  <img
+                    src="/images/logo_dark.png"
+                    alt="Mainframe logo"
+                    className="h-4 dark:hidden"
+                  />
+                  <img
+                    src="/images/logo_light.png"
+                    alt="Mainframe logo"
+                    className="h-4 hidden dark:block"
+                  />
+                  <span className="text-xs text-muted-foreground font-bold">
+                    Mainframe
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </DialogContent>
