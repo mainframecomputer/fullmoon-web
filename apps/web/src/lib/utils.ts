@@ -6,30 +6,44 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getMoonPhase(): string {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
+  // Get current date
+  const currentDate = new Date();
 
-  // Calculate the Julian date
-  const jd =
-    367 * year -
-    Math.floor((7 * (year + Math.floor((month + 9) / 12))) / 4) +
-    Math.floor((275 * month) / 9) +
-    day -
-    730530;
+  // Define base date (known new moon date)
+  const baseDate = new Date(2000, 0, 6); // Note: months are 0-based in JavaScript
 
-  // Calculate the moon's age in days (0-29.53)
-  const moonAge = ((jd % 29.53) + 29.53) % 29.53;
+  // Calculate days since base date
+  const daysSinceBaseDate =
+    (currentDate.getTime() - baseDate.getTime()) / (1000 * 60 * 60 * 24);
 
-  // Determine the moon phase based on age
-  if (moonAge < 1.84566) return "new";
-  if (moonAge < 5.53699) return "waxing-crescent";
-  if (moonAge < 9.22831) return "first-quarter";
-  if (moonAge < 12.91963) return "waxing-gibbous";
-  if (moonAge < 16.61096) return "full";
-  if (moonAge < 20.30228) return "waning-gibbous";
-  if (moonAge < 23.99361) return "last-quarter";
-  if (moonAge < 27.68493) return "waning-crescent";
+  // Moon phase repeats approximately every 29.53 days
+  const moonCycleLength = 29.53;
+  const daysIntoCycle = daysSinceBaseDate % moonCycleLength;
+
+  // Determine the phase based on how far into the cycle we are
+  if (daysIntoCycle < 1.8457) {
+    return "new";
+  }
+  if (daysIntoCycle < 5.536) {
+    return "waxing-crescent";
+  }
+  if (daysIntoCycle < 9.228) {
+    return "first-quarter";
+  }
+  if (daysIntoCycle < 12.919) {
+    return "waxing-gibbous";
+  }
+  if (daysIntoCycle < 16.61) {
+    return "full";
+  }
+  if (daysIntoCycle < 20.302) {
+    return "waning-gibbous";
+  }
+  if (daysIntoCycle < 23.993) {
+    return "last-quarter";
+  }
+  if (daysIntoCycle < 27.684) {
+    return "waning-crescent";
+  }
   return "new";
 }
