@@ -1,13 +1,82 @@
-# fullmoon: local intelligence
+# fullmoon web
 
 ### chat with private and local large language models.
 
-A monorepo containing two versions of the fullmoon web application:
+## quick start: using fullmoon with your local llm
 
-1. A local version using SQLite for storage
-2. A web version using IndexedDB for client-side storage live on https://web.fullmoon.app
+### step 1: download a local model
 
-## Project Structure
+you have two main options for getting local models:
+
+#### option a: using ollama
+
+```bash
+# Install Ollama from https://ollama.ai
+# Then pull any model:
+ollama pull llama3.2:1b        # Llama 3.2
+ollama pull mistral       # Mistral 7B
+
+```
+
+#### option b: download from hugging face
+
+1. Visit [Hugging Face](https://huggingface.co/models)
+2. Search for compatible models (e.g., Llama 3)
+3. Download using Git LFS:
+
+```bash
+# Example for Mistral 7B
+git lfs install
+git clone https://huggingface.co/mistralai/Mistral-7B-v0.1
+```
+
+### step 2: run an openai-compatible server
+
+choose one of these servers:
+
+- [ollama](https://ollama.ai/)
+
+  ```bash
+  ollama serve
+  ```
+
+- [mlx omni server](https://github.com/ml-explore/mlx-examples/tree/main/llms/mlx-omni) (for mac with apple silicon)
+
+  ```bash
+  pip install mlx-omni-server
+  mlx-omni-server
+  ```
+
+- [litellm](https://github.com/BerriAI/litellm)
+
+### step 3: create a public endpoint
+
+make your local server accessible using [ngrok](https://ngrok.com/) or [localtunnel](https://localtunnel.me):
+
+```bash
+# For Ollama
+ngrok http 11434 --host-header="localhost:11434"
+
+# For MLX Omni Server
+ngrok http 10240
+```
+
+### step 4: configure fullmoon
+
+1. go to [web.fullmoon.app](https://web.fullmoon.app)
+2. open settings
+3. enter your endpoint details:
+   - endpoint URL: `https://your-ngrok-url.ngrok.io/v1`
+   - model name: Same as the model you downloaded (e.g., `llama2`, `mistral`)
+
+## development guide
+
+a monorepo containing two versions of the fullmoon web app
+
+1. a local version using SQLite for storage
+2. a web version using IndexedDB for client-side storage live on https://web.fullmoon.app
+
+### project structure
 
 ```
 apps/
@@ -18,136 +87,47 @@ packages/
   └── ui/             # Shared UI components
 ```
 
-## Getting Started
-
-### Prerequisites
+### prerequisites
 
 - Node.js 18+
 - pnpm 8+
 
-### Installation
+### installation
 
 ```bash
 pnpm install
 ```
 
-### Development
+### running locally
 
-To run the local version (with SQLite):
+For local version (sqlite):
 
 ```bash
+# Setup database
+npx prisma migrate dev
+
+# Start development server
 pnpm dev --filter local
 ```
 
-To run the web version (with IndexedDB):
+For web version (IndexedDB):
 
 ```bash
 pnpm dev --filter web
 ```
 
-### Building
-
-To build all apps and packages:
+### building
 
 ```bash
+# Build all
 pnpm build
-```
 
-To build a specific app:
-
-```bash
+# Build specific app
 pnpm build --filter local
 # or
 pnpm build --filter web
 ```
 
-### Local LLM setup
-
-#### Using MLX server
-
-**with uv**
-
-```bash
-# with uv (recommended)
-# lets install UV first
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-Once installed, restart terminal
-
-```bash
-uv venv --python 3.11  # we need this python version for the mlx-omni-server package to work
-source .venv/bin/activate
-# lets install the mlx-omni-server
-uv pip install mlx-omni-server
-# start the mlx-omni-server
-mlx-omni-server
-```
-
-**with pip**
-
-```bash
-# with pip
-
-python -m venv venv
-source venv/bin/activate
-
-pip install mlx-omni-server
-
-# start the mlx omni server
-mlx-omni-server
-```
-
-### Running the local (apps/local) locally
-
-lets run the db migrations locally
-
-```bash
-npx prisma migrate dev
-```
-
-```bash
-npm run build
-```
-
-and go to localhost:3000
-
-### Using MLX Omni server
-
-```bash
-mlx-omni-server
-```
-
-### Using Ollama server
-
-```bash
-ollama serve
-```
-
-## Exposing the local server via ngrok
-
-### with mlx omni server
-
-```bash
-ngrok http 10240
-```
-
-### with ollama
-
-```bash
-ngrok http 11434 --host-header="localhost:11434"
-```
-
-## Features
-
-- Chat interface with AI
-- Conversation management
-- Local storage options:
-  - SQLite for desktop/local version
-  - IndexedDB for web version
-- Shared UI components between versions
-- TypeScript support
-
-## License
+## license
 
 MIT
