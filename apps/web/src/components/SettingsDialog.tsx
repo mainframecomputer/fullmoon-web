@@ -232,35 +232,45 @@ export default function SettingsDialog({
         </DialogTitle>
       </DialogHeader>
       <div className="space-y-4">
-        <div className="space-y-2">
-          <div className="text-sm">custom endpoint URL</div>
-          <Input
-            type="text"
-            placeholder="openai compatible endpoint url"
-            value={customEndpoint}
-            onChange={(e) => setCustomEndpoint(e.target.value)}
-            className="h-8"
-          />
-          <div className="text-sm space-y-4">model name</div>
-          <Input
-            type="text"
-            placeholder="model name (e.g. gpt-4)"
-            value={customModelName}
-            onChange={(e) => setCustomModelName(e.target.value)}
-            className="h-8"
-          />
-          <Button
-            variant="secondary"
-            className="h-8 px-3 w-full hover:shadow-sm"
-            onClick={handleSaveEndpoint}
-          >
-            {saveSuccess ? (
-              <Check className="h-4 w-4 animate-in zoom-in duration-300" />
-            ) : (
-              "save endpoint settings"
-            )}
-          </Button>
+        <div className="overflow-hidden rounded-xl border bg-card">
+          <div className="space-y-px">
+            <div className="px-4 py-2 border-b">
+              <div className="text-xs text-muted-foreground mb-1">
+                endpoint URL
+              </div>
+              <Input
+                type="text"
+                placeholder="openai compatible endpoint url"
+                value={customEndpoint}
+                onChange={(e) => setCustomEndpoint(e.target.value)}
+                className="h-6 px-0 border-0 shadow-none focus-visible:ring-0 bg-transparent placeholder:text-muted-foreground/50 text-sm"
+              />
+            </div>
+            <div className="px-4 py-2">
+              <div className="text-xs text-muted-foreground mb-1">
+                model name
+              </div>
+              <Input
+                type="text"
+                placeholder="model name (e.g. gpt-4)"
+                value={customModelName}
+                onChange={(e) => setCustomModelName(e.target.value)}
+                className="h-6 px-0 border-0 shadow-none focus-visible:ring-0 bg-transparent placeholder:text-muted-foreground/50 text-sm"
+              />
+            </div>
+          </div>
         </div>
+        <Button
+          variant="secondary"
+          className="w-full h-8"
+          onClick={handleSaveEndpoint}
+        >
+          {saveSuccess ? (
+            <Check className="h-4 w-4 animate-in zoom-in duration-300" />
+          ) : (
+            "save endpoint settings"
+          )}
+        </Button>
       </div>
     </>
   );
