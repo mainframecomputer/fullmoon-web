@@ -1,4 +1,4 @@
-import { openDB, type DBSchema, type IDBPObjectStore } from "idb";
+import { openDB, type DBSchema } from "idb";
 import type {
   DatabaseAdapter,
   Message,
