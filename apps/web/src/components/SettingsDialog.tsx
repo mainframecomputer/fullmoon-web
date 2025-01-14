@@ -153,6 +153,18 @@ export default function SettingsDialog({
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </Button>
         </div>
+
+        <div className="overflow-hidden rounded-lg border bg-card">
+          <a
+            href="https://github.com/mainframecomputer/fullmoon-web"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between px-4 py-2 hover:bg-accent transition-colors border-b last:border-0 text-sm text-blue-400"
+          >
+            code
+            <MoveUpRight className="h-4 w-4 text-muted-foreground" />
+          </a>
+        </div>
         <div className="flex flex-col items-center gap-2 pt-8 pb-8">
           <div className="text-muted-foreground">
             <MoonPhaseIcon
