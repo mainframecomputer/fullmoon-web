@@ -23,6 +23,7 @@ import { IndexedDBAdapter } from "@/lib/indexeddb";
 import type { Message as AiMessage } from "ai";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import readPDFText from "react-pdftotext";
+import { ChatDrawer } from "@/components/ChatDrawer";
 
 const db = new IndexedDBAdapter();
 
@@ -247,19 +248,39 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
     setCustomEndpointSettings(endpointSettings);
   }, []);
 
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const handleMenuClick = () => {
+    if (window.innerWidth < 640) {
+      // sm breakpoint
+      setIsDrawerOpen(true);
+    } else {
+      toggleSidebar();
+    }
+  };
+
   return (
     <div
       className={`flex-1 flex justify-center transition-all duration-200 ease-in-out ${
         isSidebarOpen ? "pl-64" : "pl-0"
       }`}
     >
-      <div className="fixed top-0 left-0 right-0 p-4 bg-background border-b text-center">
+      <div className="fixed top-0 left-0 right-0 p-4 bg-background border-b">
         <div
           className={`flex items-center justify-between h-6 transition-all duration-200 ease-in-out ${
-            isSidebarOpen ? "ml-64" : "ml-20"
+            isSidebarOpen ? "ml-64" : "ml-0 sm:ml-20"
           }`}
         >
-          <h1 className="text-md font-bold">{convo?.title || "chat"}</h1>
+          <button
+            type="button"
+            onClick={handleMenuClick}
+            className="sm:hidden p-2 rounded-full bg-secondary hover:bg-secondary/80"
+          >
+            <Menu className="h-3 w-3" />
+          </button>
+          <h1 className="text-md font-bold text-center sm:text-left flex-1">
+            {convo?.title || "chat"}
+          </h1>
           <Button
             variant="ghost"
             size="icon"
@@ -271,10 +292,10 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
         </div>
       </div>
 
-      <div className="fixed top-4 left-4 z-40 flex gap-2">
+      <div className="fixed top-4 left-4 z-40 sm:flex hidden gap-2">
         <button
           type="button"
-          onClick={toggleSidebar}
+          onClick={handleMenuClick}
           className="p-2 rounded-full bg-secondary hover:bg-secondary/80"
         >
           <Menu className="h-3 w-3" />
@@ -424,6 +445,8 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
         onOpenChange={handleOpenChange}
         onSettingsChange={refreshEndpointSettings}
       />
+
+      <ChatDrawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen} />
     </div>
   );
 }
