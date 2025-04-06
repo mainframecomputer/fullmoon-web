@@ -51,6 +51,7 @@ export default function SettingsDialog({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [customEndpoint, setCustomEndpoint] = useState<string>("");
   const [customModelName, setCustomModelName] = useState<string>("");
+  const [customApiKey, setCustomApiKey] = useState<string>("");
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [currentView, setCurrentView] = useState<
     "main" | "appearance" | "endpoint" | "chats" | "credits"
@@ -66,8 +67,10 @@ export default function SettingsDialog({
     if (open) {
       db.getCustomEndpoint().then((settings) => {
         if (mounted) {
+          console.log("Loading settings:", settings);
           setCustomEndpoint(settings.endpoint || "");
           setCustomModelName(settings.modelName || "");
+          setCustomApiKey(settings.apiKey || "");
         }
       });
     } else {
@@ -95,9 +98,15 @@ export default function SettingsDialog({
   const handleSaveEndpoint = async () => {
     try {
       setSaveSuccess(true);
+      console.log("Saving settings:", {
+        endpoint: customEndpoint || undefined,
+        modelName: customModelName || undefined,
+        apiKey: customApiKey || undefined,
+      });
       await db.setCustomEndpoint(
         customEndpoint || undefined,
-        customModelName || undefined
+        customModelName || undefined,
+        customApiKey || undefined
       );
       onSettingsChange?.();
       setTimeout(() => {
@@ -258,7 +267,7 @@ export default function SettingsDialog({
                 className="h-6 px-0 border-0 shadow-none focus-visible:ring-0 bg-transparent placeholder:text-muted-foreground/50 text-sm"
               />
             </div>
-            <div className="px-4 py-2">
+            <div className="px-4 py-2 border-b">
               <div className="text-xs text-muted-foreground mb-1">
                 model name
               </div>
@@ -267,6 +276,18 @@ export default function SettingsDialog({
                 placeholder="model name (e.g. gpt-4)"
                 value={customModelName}
                 onChange={(e) => setCustomModelName(e.target.value)}
+                className="h-6 px-0 border-0 shadow-none focus-visible:ring-0 bg-transparent placeholder:text-muted-foreground/50 text-sm"
+              />
+            </div>
+            <div className="px-4 py-2">
+              <div className="text-xs text-muted-foreground mb-1">
+                api key (optional)
+              </div>
+              <Input
+                type="password"
+                placeholder="your api key"
+                value={customApiKey}
+                onChange={(e) => setCustomApiKey(e.target.value)}
                 className="h-6 px-0 border-0 shadow-none focus-visible:ring-0 bg-transparent placeholder:text-muted-foreground/50 text-sm"
               />
             </div>
