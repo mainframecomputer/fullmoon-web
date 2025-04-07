@@ -10,9 +10,12 @@ export async function POST(req: Request) {
 
   const baseURL = customEndpointSettings?.endpoint || process.env.LLM_BASE_URL;
 
-  const openai = createOpenAI({
+  const openaiConfig = {
     baseURL,
-  });
+    apiKey: customEndpointSettings?.apiKey,
+  };
+
+  const openai = createOpenAI(openaiConfig);
 
   try {
     const result = streamText({

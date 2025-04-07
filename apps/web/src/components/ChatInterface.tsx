@@ -65,6 +65,7 @@ export function ChatInterface({ convo }: ChatInterfaceProps) {
     | {
         endpoint?: string;
         modelName?: string;
+        apiKey?: string;
       }
     | undefined
   >(undefined);
